@@ -1,6 +1,6 @@
 import {ComponentMetadata as Component, ViewMetadata as View, EventEmitter, CORE_DIRECTIVES} from 'angular2/angular2';
 import {Location} from 'services/location'
-import {Upload} from 'upload'
+import {Upload} from 'components/upload'
 
 @Component({
   selector: 'piratexchange',
@@ -8,7 +8,7 @@ import {Upload} from 'upload'
 })
 
 @View({
-  templateUrl: 'piratexchange.html',
+  templateUrl: '/components/piratexchange.html',
   directives: [CORE_DIRECTIVES, Upload]
 })
 

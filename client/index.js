@@ -1,7 +1,7 @@
 import {ComponentMetadata as Component, ViewMetadata as View, bootstrap} from 'angular2/angular2';
 import {Location} from 'services/location';
 import {WebRTC} from 'services/webrtc';
-import {Piratexchange} from 'piratexchange';
+import {Piratexchange} from 'components/piratexchange';
 
 @Component({
   selector: 'main',
