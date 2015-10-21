@@ -1,0 +1,22 @@
+{
+  "name": "piratexchange",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular2": "2.0.0-alpha.36",
+    "express": "^4.13.3",
+    "gulp-live-server": "0.0.29",
+    "reflect-metadata": "0.1.1",
+    "systemjs": "0.18.17"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.9.11",
+    "gulp": "3.9.0",
+    "gulp-concat": "2.6.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-rename": "1.2.2",
+    "gulp-shell": "0.4.3",
+    "gulp-traceur": "0.17.1",
+    "gulp-webserver": "0.9.1",
+    "jshint-stylish": "^2.0.1"
+  }
+}
