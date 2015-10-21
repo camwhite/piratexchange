@@ -1,4 +1,4 @@
-import {ComponentMetadata as Component, ViewMetadata as View, EventEmitter, CORE_DIRECTIVES} from 'angular2/angular2';
+import {ComponentMetadata as Component, ViewMetadata as View, CORE_DIRECTIVES} from 'angular2/angular2';
 import {Location} from 'services/location'
 import {Upload} from 'components/upload'
 
@@ -17,8 +17,5 @@ export class Piratexchange {
     locator.getLocation()
     .then((coords) => this.location = coords)
     .catch((err) => console.log(err));
-  }
-  onFileChanged(newFile) {
-    console.log(newFile);
   }
 }
