@@ -14,5 +14,5 @@ server.listen(3000, function() {
 });
 
 io.on('connection', function(socket) {
-  console.log('yooo');
+  console.log('Socket ' + socket.id + ' connected at ' + new Date());
 });
