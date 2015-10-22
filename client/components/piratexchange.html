@@ -3,6 +3,6 @@
 <p *ng-if="!location">Locating</p>
 <p *ng-if="location">Lat: {{ location.lat }} Long: {{ location.lng }}</p>
 
-<button *ng-if="location" (click)="match()" >MATCH</button>
+<button *ng-if="location" (click)="matchmaking()" >MATCH</button>
 
 <upload (fileChanged)="onFileChanged($event)"></upload>

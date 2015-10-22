@@ -15,4 +15,8 @@ server.listen(3000, function() {
 
 io.on('connection', function(socket) {
   console.log('Socket ' + socket.id + ' connected at ' + new Date());
+
+  socket.on('user:located', (pos) => {
+    socket.broadcast.emit('push:location', {pos: pos, id: socket.id});
+  });
 });

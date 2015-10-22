@@ -15,6 +15,9 @@ import {Upload} from 'components/upload';
 
 export class Piratexchange {
   constructor(locator: Location, socket: Socket) {
+    this.users = [];
+    this.distances = [{id: '1234', distance: 0}];
+
     locator.getLocation()
     .then((coords) => {
       this.location = {
@@ -23,13 +26,27 @@ export class Piratexchange {
       }
     })
     .catch((err) => console.log(err));
+
+    socket.on('push:location', (user) => {
+      this.users.push(user);
+      console.log(this.users);
+    })
   }
-  match() {
+  matchmaking() {
     let geo = google.maps.geometry.spherical;
     let p1 = new google.maps.LatLng(this.location.lat, this.location.lng);
-    let p2 = new google.maps.LatLng(50.087692, 14.421150);
 
-    this.distance = geo.computeDistanceBetween(p1, p2);
-    console.log(this.distance);
+    this.users.map((user) => {
+      let p2 = new google.maps.LatLng(user.pos.lat, user.pos.lng);
+      let distance = geo.computeDistanceBetween(p1, p2);
+
+      this.distances.push({id: user.id, distance: distance});
+    });
+
+    this.match = this.distances.reduce(function (prev, curr) {
+      return (Math.abs(curr.distance) < Math.abs(prev.distance) ? curr : prev);
+    });
+
+    console.log(this.match);
   }
 }
