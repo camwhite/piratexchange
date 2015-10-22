@@ -8,6 +8,7 @@
   </head>
   <body>
 
+    <base href></base>
     <main>Loading...</main>
 
     <script src="lib/traceur-runtime.js"></script>
@@ -20,7 +21,13 @@
     <script src="../../config.js"></script>
 
     <script src="lib/angular2.js"></script>
+    <script src="lib/router.dev.js"></script>
     <script src="lib/socket.io.js"></script>
+
+    <script>
+      baseElement = document.querySelector('base');
+      baseElement.attr = baseElement.getAttribute;
+    </script>
 
     <script>
       System.import('index').catch(console.log.bind(console));

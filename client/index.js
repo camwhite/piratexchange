@@ -1,5 +1,5 @@
 import {ComponentMetadata as Component, ViewMetadata as View, bootstrap} from 'angular2/angular2';
-import {Router, RouterOutlet, RootRouter} from 'angular2/router';
+import {ROUTER_BINDINGS, Router, RouterOutlet} from 'angular2/router';
 import {Location} from 'services/location';
 import {WebRTC} from 'services/webrtc';
 import {Socket} from 'services/socket';
@@ -7,7 +7,8 @@ import {Piratexchange} from 'components/piratexchange';
 
 @Component({
   selector: 'main',
-  viewBindings: [Location, WebRTC, Socket]
+  viewBindings: [Location, WebRTC, Socket],
+  providers: [Router]
 })
 
 @View({
@@ -20,14 +21,11 @@ import {Piratexchange} from 'components/piratexchange';
 class Main {
   constructor(router: Router) {
     this.router = router;
-    // Here we configure, for each route, which component should be added and its alias for URL linking
+
     router
-      .config('/', Piratexchange, 'piratexchange')
+      .config([{ path: '/', as: 'piratexchange', component: Piratexchange }])
       .then((_) => router.navigate('/'))
   }
 }
 
-bootstrap(Main, [
-  // Here we're creating the Router.
-  // We're also configuring DI, so that each time a Router is requested, it's automatically returned.
-  bind(Router).toValue(new RootRouter(new Pipeline())));
+bootstrap(Main, ROUTER_BINDINGS);
