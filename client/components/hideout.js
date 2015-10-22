@@ -14,7 +14,11 @@ import {Upload} from 'components/upload';
 })
 
 export class Hideout {
-  constructor(routeParams: RouteParams) {
-    console.log(routeParams.params);
+  constructor(routeParams: RouteParams, socket: Socket) {
+    this.routeParams = routeParams;
+    this.socket = socket;
+
+    this.socket.unSync();
+    this.socket.init('hideout:' + this.routeParams.params.id + this.socket.socket.id);
   }
 }

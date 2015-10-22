@@ -9,9 +9,12 @@ export class Socket {
   on(evt, cb) {
     this.socket.on(evt, (payload) => {
       cb(payload);
-    })
+    });
   }
   init(room) {
     this.emit('join', room);
+  }
+  unSync() {
+    this.socket.removeAllListeners();
   }
 }
