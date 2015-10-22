@@ -65,7 +65,7 @@ gulp.task('dependencies', function () {
     'node_modules/systemjs/dist/system-csp-production.src.js',
     'node_modules/systemjs/dist/system.js',
     'node_modules/reflect-metadata/Reflect.js',
-    'node_modules/angular2/bundles/angular2.js',
+    'node_modules/angular2/bundles/*.js',
     'node_modules/socket.io-client/socket.io.js'
   ])
     .pipe(plumber())
