@@ -1,10 +1,11 @@
 import {ComponentMetadata as Component, ViewMetadata as View, CORE_DIRECTIVES} from 'angular2/angular2';
-import {Location} from 'services/location'
-import {Upload} from 'components/upload'
+import {Location} from 'services/location';
+import {Socket} from 'services/socket';
+import {Upload} from 'components/upload';
 
 @Component({
   selector: 'piratexchange',
-  prodivers: [Location]
+  prodivers: [Location, Socket]
 })
 
 @View({
@@ -13,7 +14,7 @@ import {Upload} from 'components/upload'
 })
 
 export class Piratexchange {
-  constructor(locator: Location) {
+  constructor(locator: Location, socket: Socket) {
     locator.getLocation()
     .then((coords) => this.location = coords)
     .catch((err) => console.log(err));
