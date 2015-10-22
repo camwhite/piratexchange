@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     shell = require('gulp-shell'),
     traceur = require('gulp-traceur'),
-    browserSync = require('browser-sync').create(),
+    webserver = require('gulp-webserver'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
     gls = require('gulp-live-server'),
@@ -18,7 +18,7 @@ gulp.task('default', ['dependencies', 'js', 'node', 'html', 'css']);
 gulp.task('dev', ['watch', 'serve']);
 
 // serve the build dir
-gulp.task('serve', ['express', 'bs']);
+gulp.task('serve', ['express', 'webserver']);
 
 // start express server
 gulp.task('express', function () {
@@ -27,17 +27,13 @@ gulp.task('express', function () {
 });
 
 // init browsersync
-gulp.task('bs', function () {
-  browserSync.init({
-    server: {
-      baseDir: "./build/client",
-    },
-    ui: {
-      port: 9001
-    },
-    port: 9000,
-    notify: false
-  });
+gulp.task('webserver', function () {
+  gulp.src('build/client')
+    .pipe(webserver({
+      port: 9000,
+      livereload: true,
+      open: true
+    }));
 });
 
 // JShint
@@ -89,23 +85,27 @@ gulp.task('js', function () {
     .pipe(rename({
       extname: '.js'
     }))
-    .pipe(gulp.dest('build/client'), browserSync.reload());
+    .pipe(gulp.dest('build/client'))
+    .pipe(server.notify())
 });
 
 gulp.task('node', function() {
   return gulp.src('server/**/*.js')
     .pipe(plumber())
-    .pipe(gulp.dest('build/server', browserSync.reload()))
+    .pipe(gulp.dest('build/server'))
+    .pipe(server.notify())
 });
 
 // move html
 gulp.task('html', function () {
   return gulp.src('client/**/*.html')
-    .pipe(gulp.dest('build/client', browserSync.reload()))
+    .pipe(gulp.dest('build/client'))
+    .pipe(server.notify())
 });
 
 // move css
 gulp.task('css', function () {
   return gulp.src('client/**/*.css')
-    .pipe(gulp.dest('build/client', browserSync.stream()))
+    .pipe(gulp.dest('build/client'))
+    .pipe(server.notify())
 });
