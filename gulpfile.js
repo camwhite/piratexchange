@@ -7,6 +7,7 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
     gls = require('gulp-live-server'),
+    plumber = require('gulp-plumber'),
     server;
 
 
@@ -39,13 +40,20 @@ gulp.task('bs', function () {
   });
 });
 
+// JShint
+gulp.task('jshint', function() {
+  return gulp.src(['server/**/*.js', 'client/**/*.js'])
+    .pipe(jshint({esnext: true}))
+    .pipe(jshint.reporter(stylish))
+})
+
 // watch for changes and run the relevant task
 gulp.task('watch', function () {
-  gulp.watch('server/**/*.js', ['node', function() {
+  gulp.watch('server/**/*.js', ['node', 'jshint', function() {
     server.start();
   }]);
 
-  gulp.watch('client/**/*.js', ['js']);
+  gulp.watch('client/**/*.js', ['js', 'jshint']);
   gulp.watch('client/**/*.html', ['html']);
   gulp.watch('client/**/*.css', ['css']);
 });
@@ -59,12 +67,14 @@ gulp.task('dependencies', function () {
     'node_modules/reflect-metadata/Reflect.js',
     'node_modules/angular2/bundles/angular2.js'
   ])
+    .pipe(plumber())
     .pipe(gulp.dest('build/client/lib'));
 });
 
 // transpile & move js
 gulp.task('js', function () {
   return gulp.src('client/**/*.js')
+    .pipe(plumber())
     .pipe(rename({
       extname: ''
     }))
@@ -78,15 +88,11 @@ gulp.task('js', function () {
     .pipe(rename({
       extname: '.js'
     }))
-    .pipe(gulp.dest('build/client'))
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish));
+    .pipe(gulp.dest('build/client'), browserSync.reload());
 });
 
 gulp.task('node', function() {
   return gulp.src('server/**/*.js')
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish))
     .pipe(gulp.dest('build/server', browserSync.reload()))
 });
 
