@@ -18,7 +18,9 @@ export class Hideout {
     this.routeParams = routeParams;
     this.socket = socket;
 
+    this.room = 'hideout:' + this.routeParams.params.id + this.socket.socket.id;
+
     this.socket.unSync();
-    this.socket.init('hideout:' + this.routeParams.params.id + this.socket.socket.id);
+    this.socket.init(this.room);
   }
 }
