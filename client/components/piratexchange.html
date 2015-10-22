@@ -1,8 +1,8 @@
 <h1>pirateXchange</h1>
 
-<p *ng-if="!location">Locating</p>
-<p *ng-if="location">Lat: {{ location.lat }} Long: {{ location.lng }}</p>
+<p *ng-if="!me.location">Locating</p>
+<p *ng-if="me.location">Lat: {{ me.location.lat }} Long: {{ me.location.lng }}</p>
 
-<button *ng-if="location" (click)="matchmaking()" >MATCH</button>
+<button *ng-if="me.location" (click)="matchmaking()">MATCH</button>
 
-<upload (fileChanged)="onFileChanged($event)"></upload>
+<h2 *ng-if="noMatches">No Matches AARGH</h2>

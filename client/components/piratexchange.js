@@ -1,40 +1,55 @@
 import {ComponentMetadata as Component, ViewMetadata as View, CORE_DIRECTIVES} from 'angular2/angular2';
+import {Router} from 'angular2/router';
 import {Location} from 'services/location';
 import {Socket} from 'services/socket';
-import {Upload} from 'components/upload';
 
 @Component({
   selector: 'piratexchange',
-  prodivers: [Location, Socket]
+  prodivers: [Router, Location, Socket]
 })
 
 @View({
   templateUrl: '/components/piratexchange.html',
-  directives: [CORE_DIRECTIVES, Upload]
+  directives: [CORE_DIRECTIVES]
 })
 
 export class Piratexchange {
-  constructor(locator: Location, socket: Socket) {
-    this.users = [];
-    this.distances = [{id: '1234', distance: 0}];
+  constructor(router: Router, locator: Location, socket: Socket) {
+    this.router = router;
+    this.locator = locator;
+    this.socket = socket;
 
-    locator.getLocation()
+    this.me = {
+      id: this.socket.socket.id
+    }
+
+    this.users = [];
+    this.distances = [];
+
+    this.locator.getLocation()
     .then((coords) => {
-      this.location = {
+      this.me.location = {
         lat: coords.latitude,
         lng: coords.longitude
       }
     })
     .catch((err) => console.log(err));
 
-    socket.on('push:location', (user) => {
+    this.userHandler();
+  }
+  userHandler() {
+    this.socket.on('push:location', (user) => {
       this.users.push(user);
       console.log(this.users);
-    })
+    });
+    this.socket.on('users:matched', (match) => {
+      console.log(match);
+      this.router.navigate('/hideout/' + match.id);
+    });
   }
   matchmaking() {
     let geo = google.maps.geometry.spherical;
-    let p1 = new google.maps.LatLng(this.location.lat, this.location.lng);
+    let p1 = new google.maps.LatLng(this.me.location.lat, this.me.location.lng);
 
     this.users.map((user) => {
       let p2 = new google.maps.LatLng(user.pos.lat, user.pos.lng);
@@ -43,9 +58,19 @@ export class Piratexchange {
       this.distances.push({id: user.id, distance: distance});
     });
 
-    this.match = this.distances.reduce(function (prev, curr) {
+    this.match = this.distances.length == 0 ? undefined : this.distances.reduce(function (prev, curr) {
       return (Math.abs(curr.distance) < Math.abs(prev.distance) ? curr : prev);
     });
+
+    if(this.match != undefined) {
+      this.socket.init(this.match.id);
+      this.socket.emit('match:made', this.match);
+
+      this.router.navigate('/hideout/' + this.match.id);
+    }
+    else {
+      this.noMatches = true;
+    }
 
     console.log(this.match);
   }
