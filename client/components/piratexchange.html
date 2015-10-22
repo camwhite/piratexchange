@@ -1,6 +1,8 @@
 <h1>pirateXchange</h1>
 
-<p *ng-if="!location">Loading coordinates</p>
-<p *ng-if="location">Lat: {{ location.latitude }} Long: {{ location.longitude }}</p>
+<p *ng-if="!location">Locating</p>
+<p *ng-if="location">Lat: {{ location.lat }} Long: {{ location.lng }}</p>
+
+<button *ng-if="location" (click)="match()" >MATCH</button>
 
 <upload (fileChanged)="onFileChanged($event)"></upload>
