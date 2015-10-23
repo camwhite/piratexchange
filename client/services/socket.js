@@ -12,7 +12,7 @@ export class Socket {
     });
   }
   init(room) {
-    this.emit('join', room);
+    this.socket.emit('join', room);
   }
   unSync() {
     this.socket.removeAllListeners();

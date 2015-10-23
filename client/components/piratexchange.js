@@ -58,7 +58,7 @@ export class Piratexchange {
       this.distances.push({id: user.id, distance: distance});
     });
 
-    this.match = this.distances.length == 0 ? undefined : this.distances.reduce(function (prev, curr) {
+    this.match = this.distances.length == 0 ? undefined : this.distances.reduce((prev, curr) => {
       return (Math.abs(curr.distance) < Math.abs(prev.distance) ? curr : prev);
     });
 
