@@ -57,6 +57,8 @@ $mobile: "max-width: 640px";
  */
 
 body {
+  position: relative;
+  min-height: 100vh;
   background: $primary-color;
   font-family: 'Anonymous Pro';
 }
@@ -93,6 +95,39 @@ p, span, a {
   @include responsive-font(20px, 14px);
   line-height: 1.25;
   letter-spacing: 1px;
+}
+
+.loader, .loader:before, .loader:after {
+  width: get-vw(10px);
+  height: 0;
+  background: white;
+  opacity: 0;
+  animation-fill-mode: both;
+  animation: loading 1.8s infinite ease-in-out;
+}
+
+.loader {
+  @include align-hack;
+  animation-delay: 0.16s;
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+  }
+  &:before {
+    left: get-vw(-20px);
+  }
+  &:after {
+    left: get-vw(20px);
+    animation-delay: 0.32s;
+  }
+}
+
+@keyframes loading {
+  0%,
+  80%,
+  100% {height: get-vw(40px); opacity: 1;}
+  40% {height: 0; opacity: 0;}
 }
 
 @import 'components/piratexchange.scss'
