@@ -3,6 +3,7 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     shell = require('gulp-shell'),
     traceur = require('gulp-traceur'),
+    sass = require('gulp-sass'),
     webserver = require('gulp-webserver'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
@@ -12,7 +13,7 @@ var gulp = require('gulp'),
 
 
 // run init tasks
-gulp.task('default', ['dependencies', 'js', 'node', 'html', 'css']);
+gulp.task('default', ['dependencies', 'js', 'node', 'html', 'sass']);
 
 // run development task
 gulp.task('dev', ['watch', 'serve']);
@@ -51,7 +52,7 @@ gulp.task('watch', function () {
 
   gulp.watch('client/**/*.js', ['js', 'jshint']);
   gulp.watch('client/**/*.html', ['html']);
-  gulp.watch('client/**/*.css', ['css']);
+  gulp.watch('client/**/*.scss', ['sass']);
 });
 
 // move dependencies into build dir
@@ -103,9 +104,11 @@ gulp.task('html', function () {
     .pipe(server.notify())
 });
 
-// move css
-gulp.task('css', function () {
-  return gulp.src('client/**/*.css')
+// compile and move scss
+gulp.task('sass', function () {
+  gulp.src('client/**/*.scss')
+    .pipe(plumber())
+    .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('build/client'))
     .pipe(server.notify())
 });
