@@ -1,8 +1,25 @@
-<h1>pirateXchange</h1>
+<div class="landing">
 
-<p *ng-if="!me.location">Locating</p>
-<p *ng-if="me.location">Lat: {{ me.location.lat }} Long: {{ me.location.lng }}</p>
+  <div class="splash">
+    <div class="hero">
+      <h1>pirateXchange</h1>
+      <div class="location">
+        <p *ng-if="!me.location">Locating MATEY</p>
+        <p *ng-if="me.location">Lat: {{ me.location.lat }} Long: {{ me.location.lng }}</p>
+      </div>
+      <button *ng-if="me.location" (click)="matchmaking()">MATCH</button>
+      <p *ng-if="noMatches">No Matches AARGH</p>
+    </div>
+  </div>
 
-<button *ng-if="me.location" (click)="matchmaking()">MATCH</button>
+  <div class="callout">
+    <div class="hero">
+      <i class="fi-die-two"></i>
+      <h4>Match with nearest possible skallywag and offer up files</h4>
+      <i class="fi-upload"></i>
+      <i class="fi-download"></i>
+      <h4>Send your files through direct P2P connection</h4>
+    </div>
+  </div>
 
-<h2 *ng-if="noMatches">No Matches AARGH</h2>
+</div>

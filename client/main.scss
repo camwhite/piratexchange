@@ -1,0 +1,98 @@
+@import url(https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css);
+@import url(https://fonts.googleapis.com/css?family=Anonymous+Pro:400,700);
+
+/**
+ * Variables
+ */
+
+$primary-color: #D08504;
+$secondary-color: #29407C;
+$support-color: #757575;
+$accent-color: #660000;
+$warn-color: #f44336;
+$success-color: #77D658;
+
+$tablet: "max-width: 800px";
+$mobile: "max-width: 640px";
+
+/**
+ * Mixins & Functions
+ */
+
+@function get-vw($target) {
+  $vw-context: (1000*.01) * 1px;
+  @return ($target/$vw-context) * 1vw;
+}
+
+@mixin vw($base-size, $break-size, $breakpoint) {
+  font-size: get-vw($base-size);
+  letter-spacing: -1px;
+  @media screen and ($breakpoint) {
+    font-size: $break-size;
+  }
+}
+
+@mixin responsive-font($init, $scaled) {
+  font-size: $init;
+  @media screen and ($tablet) {
+    font-size: $scaled;
+  }
+}
+
+@mixin responsive-window($bg) {
+  position: relative;
+  height: 100vh;
+  background: $bg;
+}
+
+@mixin align-hack {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/**
+ * Globals
+ */
+
+body {
+  background: $primary-color;
+  font-family: 'Anonymous Pro';
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+h1 {
+  font-size: get-vw(80px);
+}
+
+h2 {
+  font-size: get-vw(65px);
+}
+
+h3 {
+  @include vw(50px, 26px, $tablet);
+}
+
+h4 {
+  @include vw(35px, 22px, $tablet);
+}
+
+h5 {
+  @include vw(25px, 20px, $tablet);
+}
+
+h6 {
+  @include vw(20px, 18px, $tablet);
+}
+
+p, span, a {
+  @include responsive-font(20px, 14px);
+  line-height: 1.25;
+  letter-spacing: 1px;
+}
+
+@import 'components/piratexchange.scss'

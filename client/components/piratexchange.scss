@@ -1,0 +1,47 @@
+.landing {
+  .splash {
+    display: flex;
+    height: 100vh;
+    background: $primary-color;
+    align-items: center;
+    justify-content: space-around;
+    .hero {
+      align-self: center;
+      h1, p {
+        margin: 15px;
+        text-align: center;
+        color: white;
+      }
+      button {
+        display: block;
+        margin: 20px auto;
+        padding: 30px;
+        background: $success-color;
+        color: white;
+        font-size: 28px;
+        font-weight: 700;
+        border: none;
+        outline: none;
+      }
+    }
+  }
+  .callout {
+    @extend .splash;
+    background: $secondary-color;
+    text-align: center;
+    .hero {
+      padding: 0 120px;
+    }
+    .fi-upload, .fi-download {
+      margin: 0 20px;
+    }
+    i {
+      @include vw(110px, 70px, $tablet);
+      color: white;
+    }
+    h4 {
+      margin: 20px 0;
+      color: white;
+    }
+  }
+}
