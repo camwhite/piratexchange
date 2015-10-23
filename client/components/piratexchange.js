@@ -2,6 +2,7 @@ import {ComponentMetadata as Component, ViewMetadata as View, CORE_DIRECTIVES} f
 import {Router} from 'angular2/router';
 import {Location} from 'services/location';
 import {Socket} from 'services/socket';
+import {SvgIcon} from 'components/svg-icon';
 
 @Component({
   selector: 'piratexchange',
@@ -10,7 +11,7 @@ import {Socket} from 'services/socket';
 
 @View({
   templateUrl: '/components/piratexchange.html',
-  directives: [CORE_DIRECTIVES]
+  directives: [CORE_DIRECTIVES, SvgIcon]
 })
 
 export class Piratexchange {

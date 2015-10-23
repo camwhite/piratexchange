@@ -32,16 +32,22 @@
     .hero {
       padding: 0 120px;
     }
-    .fi-upload, .fi-download {
-      margin: 0 20px;
+    .icon {
+      width: get-vw(150px);
+      height: get-vw(150px);
     }
-    i {
-      @include vw(110px, 70px, $tablet);
-      color: white;
+    .transfer {
+      mask: url(../assets/arrows140.svg);
+      -webkit-mask: url(../assets/arrows140.svg) center/contain no-repeat;
     }
-    h4 {
-      margin: 20px 0;
-      color: white;
+    figure {
+      display: inline-block;
+      margin: 0 auto;
+      padding: get-vw(10px);
+      border-radius: 100%;
+    }
+    p {
+      @include vw(30px, 20px, $tablet);
     }
   }
 }
