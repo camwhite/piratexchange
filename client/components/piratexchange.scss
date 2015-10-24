@@ -46,4 +46,17 @@
       @include vw(30px, 20px, $tablet);
     }
   }
+  .info {
+    @extend .splash;
+    background: $accent-color;
+    text-align: center;
+    h4 {
+      color: white;
+    }
+  }
+  .footer {
+    @extend .splash;
+    height: 500px;
+    background: darken($support-color, 30%);
+  }
 }
