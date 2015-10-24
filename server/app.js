@@ -28,6 +28,5 @@ io.on('connection', (socket) => {
   socket.on('match:made', (match) => {
     console.log('Socket ' + socket.id + ' matched with ' + match.id);
     socket.to(match.id).emit('users:matched', match);
-    console.log(socket);
   });
 });
