@@ -1,110 +1,135 @@
+import {Socket} from 'services/socket'
+
 export class WebRTC {
-  constructor() {
-    this.servers = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }]};
+  constructor(socket: Socket) {
+    this.socket = socket;
+    this.currentUserId = this.socket.socket.id;
+
+    this.servers = {'iceServers': [
+      {'url': 'stun:stun.l.google.com:19302'}
+    ]};
+
+    this.peerConnections = {};
     this.receiveBuffer = [];
     this.receiveSize = 0;
-
-    this.createConnection = this.createConnection.bind(this);
-    this.onReceiveMessageCallback = this.onReceiveMessageCallback.bind(this);
-    this.onReceiveChannelStateChange = this.onReceiveChannelStateChange.bind(this);
   }
-  init(elem) {
-    this.input = elem
-    this.input.addEventListener('change', this.createConnection.bind(this), false);
-  }
-  createConnection() {
-    this.localConnection = new RTCPeerConnection(this.servers);
+  init(params, elem) {
+    this.params = params.id;
+    this.room = `hideout:${this.params}`;
 
-    this.sendChannel = this.localConnection.createDataChannel('Send Channel');
+    this.input = elem;
+    this.input.addEventListener('change', this.makeOffer.bind(this), false);
+  }
+  getPeerConnection(id) {
+    if(this.peerConnections[id]) {
+      return this.peerConnections[id];
+    }
+
+    let pc = new RTCPeerConnection(this.servers);
+    this.peerConnections[id] = pc;
+
+    pc.onicecandidate = (evt) => {
+      if(evt.candidate != null) {
+        this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: id, ice: evt.candidate, type: 'ice'});
+      }
+    }
+
+    pc.ondatachannel = (evt) => {
+      this.receiveChannel = evt.channel;
+      this.receiveChannel.binaryType = 'arraybuffer';
+
+      this.receiveChannel.onmessage = (evt) => {
+        this.receiveBuffer.push(evt.data);
+        this.receivedSize += evt.data.byteLength;
+        console.log(this.receivedSize);
+      };
+      this.receiveChannel.onopen = () => {
+        if (this.receiveChannel.readyState === 'open') {
+          console.log('receive', evt);
+        }
+      };
+      this.receiveChannel.onclose = () => {
+        if (this.receiveChannel.readyState === 'open') {
+          console.log(this.receiveChannel);
+        }
+      };
+
+      this.receivedSize = 0;
+    }
+
+    this.sendChannel = pc.createDataChannel('Send Channel');
     this.sendChannel.binaryType = 'arraybuffer';
 
-    this.sendChannel.onopen = this.onSendChannelStateChange.bind(this);
-    this.sendChannel.onclose = this.onSendChannelStateChange.bind(this);
-    this.localConnection.onicecandidate = this.iceCallbackOne.bind(this);
+    this.sendChannel.onopen = (evt) => {
+      console.log('send', evt);
+      if (this.sendChannel.readyState === 'open') {
+        this.sendData();
+      }
+    };
+    this.sendChannel.onclose = () => {
+      this.sendChannel.close();
+      this.receiveChannel.close();
+      pc.close();
+      pc = null;
+    };
 
-    this.localConnection.createOffer(descOne => {
-      this.localConnection.setLocalDescription(descOne);
-      this.remoteConnection.setRemoteDescription(descOne);
-
-      this.remoteConnection.createAnswer(descTwo => {
-        this.remoteConnection.setLocalDescription(descTwo);
-        this.localConnection.setRemoteDescription(descTwo);
-
-      }, this.onCreateSessionDescriptionError);
-    }, this.onCreateSessionDescriptionError);
-
-    this.remoteConnection = new RTCPeerConnection(this.servers);
-    this.remoteConnection.onicecandidate = this.iceCallbackTwo.bind(this);
-    this.remoteConnection.ondatachannel = this.receiveChannelCallback.bind(this);
+    return pc;
   }
-  onCreateSessionDescriptionError(error) {
-    console.log('Failed to create session description: ' + error.toString());
+  makeOffer() {
+    let id = this.params;
+    let pc = this.getPeerConnection(id);
+    pc.createOffer(sdp => {
+      pc.setLocalDescription(sdp, () => {
+        this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: id,  type: 'sdp-offer', sdp: sdp})
+      });
+    }, (err) => console.log(err));
+  }
+  handleCall(call) {
+    var pc = this.getPeerConnection(call.by);
+    switch (call.type) {
+      case 'sdp-offer':
+        pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
+          console.log('Setting remote description by offer');
+          pc.createAnswer(sdp => {
+            pc.setLocalDescription(sdp);
+            this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: call.by, sdp: sdp, type: 'sdp-answer'});
+          }, (err) => console.log(err));
+        }, (err) => console.log(err));
+        break;
+      case 'sdp-answer':
+        pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
+          console.log('Setting remote description by answer');
+        }, (err) => console.error(err));
+        break;
+      case 'ice':
+        if (call.ice) {
+          console.log('Adding ice candidates');
+          pc.addIceCandidate(new RTCIceCandidate(call.ice));
+        }
+        break;
+    }
   }
   sendData() {
-    var file = this.input.files[0];
-    console.log(file);
-    if (file.size === 0) {
+    let file = this.input.files[0]
+    if (file == undefined) {
       return;
     }
-    var chunkSize = 16384;
-    var sliceFile = (offset) => {
-      var reader = new FileReader();
+    console.log(file);
+    let chunkSize = 16384;
+    let sliceFile = (offset) => {
+      let reader = new FileReader();
       reader.onload = (() => {
         return (e) => {
+          console.log(e);
           this.sendChannel.send(e.target.result);
           if (file.size > offset + e.target.result.byteLength) {
             setTimeout(sliceFile, 0, offset + chunkSize);
           }
         };
       })(file);
-      var slice = file.slice(offset, offset + chunkSize);
+      let slice = file.slice(offset, offset + chunkSize);
       reader.readAsArrayBuffer(slice);
     };
     sliceFile(0);
   }
-  closeDataChannels() {
-    this.sendChannel.close();
-    this.receiveChannel.close();
-    this.localConnection.close();
-    this.remoteConnection.close();
-    this.localConnection = null;
-    this.remoteConnection = null;
-  }
-  iceCallbackOne(event) {
-    if (event.candidate) {
-      this.remoteConnection.addIceCandidate(event.candidate, this.onAddIceCandidateSuccess.bind(this), this.onAddIceCandidateError.bind(this));
-    }
-  }
-  iceCallbackTwo(event) {
-    if (event.candidate) {
-      this.localConnection.addIceCandidate(event.candidate, this.onAddIceCandidateSuccess.bind(this), this.onAddIceCandidateError.bind(this));
-    }
-  }
-  onAddIceCandidateSuccess() {
-    console.log('ice callback succeeded');
-  }
-  receiveChannelCallback(event) {
-    this.receiveChannel = event.channel;
-    this.receiveChannel.binaryType = 'arraybuffer';
-    this.receiveChannel.onmessage = this.onReceiveMessageCallback;
-    this.receiveChannel.onopen = this.onReceiveChannelStateChange;
-    this.receiveChannel.onclose = this.onReceiveChannelStateChange;
-
-    this.receivedSize = 0;
-  }
-  onReceiveMessageCallback(event) {
-    this.receiveBuffer.push(event.data);
-    this.receivedSize += event.data.byteLength;
-  }
-  onSendChannelStateChange() {
-    if (this.sendChannel.readyState === 'open') {
-      this.sendData();
-    }
-  }
-  onReceiveChannelStateChange() {
-    if (this.receiveChannel.readyState === 'open') {
-      console.log(this.receiveChannel);
-    }
-  }
 }
-

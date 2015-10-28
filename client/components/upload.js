@@ -1,9 +1,10 @@
 import {ComponentMetadata as Component, ViewMetadata as View, ElementRef} from 'angular2/angular2';
+import {RouteParams} from 'angular2/router';
 import {WebRTC} from 'services/webrtc';
 
 @Component({
   selector: 'upload',
-  providers: [WebRTC]
+  providers: [RouteParams, WebRTC]
 })
 
 @View({
@@ -11,9 +12,10 @@ import {WebRTC} from 'services/webrtc';
 })
 
 export class Upload {
-  constructor(elemRef: ElementRef, webRTC: WebRTC) {
-    this.file = '';
+  constructor(elemRef: ElementRef, routeParams: RouteParams, webRTC: WebRTC) {
+    this.routeParams = routeParams;
     this.el = elemRef.nativeElement.children[0];
-    this.webRTC = webRTC.init(this.el);
+
+    this.webRTC = webRTC.init(this.routeParams.params, this.el);
   }
 }

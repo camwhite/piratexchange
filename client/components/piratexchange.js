@@ -36,16 +36,13 @@ export class Piratexchange {
     })
     .catch((err) => console.log(err));
 
-    this.userHandler();
-  }
-  userHandler() {
     this.socket.on('push:location', (user) => {
       this.users.push(user);
       console.log(this.users);
     });
     this.socket.on('users:matched', (match) => {
       console.log(match);
-      this.router.navigate('/hideout/' + match.id);
+      this.router.navigate(`/hideout/${match.id}`);
     });
   }
   matchmaking() {
@@ -64,10 +61,9 @@ export class Piratexchange {
     });
 
     if(this.match != undefined) {
-      this.socket.init(this.match.id);
       this.socket.emit('match:made', this.match);
 
-      this.router.navigate('/hideout/' + this.match.id);
+      this.router.navigate(`/hideout/${this.match.id}`);
     }
     else {
       this.noMatches = true;
