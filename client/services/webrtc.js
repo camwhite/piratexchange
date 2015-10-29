@@ -27,11 +27,9 @@ export class WebRTC {
         this.sendData();
       }
       else {
-        console.log('boo')
         this.makeOffer();
       }
     }, false);
-
   }
   getPeerConnection(id) {
     if(this.peerConnections[id]) {
@@ -134,7 +132,7 @@ export class WebRTC {
   }
   handleCall(call) {
     var pc = this.getPeerConnection(call.by);
-    switch (call.type) {
+    switch(call.type) {
       case 'sdp-offer':
         pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
           console.log('Setting remote description by offer');
@@ -159,7 +157,7 @@ export class WebRTC {
   }
   sendData() {
     let file = this.input.files[0]
-    if (file == undefined) {
+    if(file == undefined) {
       return;
     }
     this.progress.max = file.size;
