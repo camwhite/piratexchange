@@ -8,13 +8,14 @@ import {WebRTC} from 'services/webrtc';
 })
 
 @View({
-  template: '<input type="file"></input>'
+  template: `<input type="file"></input><progress max="0" value="0"></progress><a class="download"></a>`
 })
 
 export class Upload {
   constructor(elemRef: ElementRef, routeParams: RouteParams, webRTC: WebRTC) {
     this.routeParams = routeParams;
-    this.el = elemRef.nativeElement.children[0];
+    this.el = elemRef.nativeElement;
+    console.log(this.el);
 
     this.webRTC = webRTC.init(this.routeParams.params, this.el);
   }

@@ -30,13 +30,12 @@ io.on('connection', (socket) => {
     socket.to(match.id).emit('users:matched', match);
   });
 
-  socket.on('new:candidate', (peer) => {
-    console.log(`Socket ${socket.id} asked for ${peer.to}`)
-    socket.to(peer.to).emit('add:candidate', peer);
+  socket.on('msg', (call) => {
+    console.log(`Socket ${call.by} initiated ${call.type} with ${call.to}`)
+    socket.to(call.room).emit('msg', call);
   });
 
-  socket.on('msg', (call) => {
-    console.log(`Socket ${call.by} communicated with ${call.to}`)
-    socket.to(call.room).emit('msg', call);
+  socket.on('sending:data', (file) => {
+    socket.to(file.room).broadcast.emit('data', file);
   });
 });

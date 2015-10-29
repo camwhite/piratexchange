@@ -29,5 +29,13 @@ export class Hideout {
     this.socket.on('msg', (call) => {
       this.webRTC.handleCall(call);
     });
+
+    this.socket.on('data', (file) => {
+      this.webRTC.file = {
+        name: file.name,
+        size: file.size
+      };
+      this.webRTC.progress.max = file.size;
+    });
   }
 }
