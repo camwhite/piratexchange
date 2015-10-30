@@ -21,7 +21,6 @@ export class Hideout {
     this.webRTC = webRTC;
 
     this.room = `hideout:${this.routeParams.params.id}`;
-    this.progress = this.webRTC.receivedSize;
 
     this.socket.unSync();
     this.socket.init(this.room);
@@ -31,11 +30,13 @@ export class Hideout {
     });
 
     this.socket.on('data', (file) => {
-      this.webRTC.file = {
+      this.file = {
         name: file.name,
         size: file.size
       };
-      this.webRTC.progress.max = file.size;
+
+      this.webRTC.file = this.file;
+      this.webRTC.receiveProgress.max = file.size;
     });
   }
 }

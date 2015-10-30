@@ -19,10 +19,12 @@ export class WebRTC {
     this.room = `hideout:${this.params}`;
 
     this.input = elem.children[0];
-    this.progress = elem.children[1];
-    this.download = elem.children[2];
+    this.sendProgress = elem.children[1];
+    this.receiveProgress = elem.children[2];
+    this.download = elem.children[3];
 
     this.input.addEventListener('change', () => {
+
       if(this.sendChannel != undefined) {
         this.sendData();
       }
@@ -53,20 +55,21 @@ export class WebRTC {
         this.receiveBuffer.push(evt.data);
         this.receivedSize += evt.data.byteLength;
 
-        this.progress.value = this.receivedSize;
+        this.receiveProgress.value = this.receivedSize;
 
         if (this.receivedSize == this.file.size) {
           let received = new Blob(this.receiveBuffer);
 
           this.receivedSize = 0;
           this.receiveBuffer = [];
-
           this.download.href = URL.createObjectURL(received);
           this.download.download = this.file.name;
-          let text = 'Click to download \'' + this.file.name + '\' (' + this.file.size +' bytes)';
+
+          let text =`Save treasure ${this.file.name} - ${this.file.size}(bytes) to chest`;
           this.download.appendChild(document.createTextNode(text));
         }
       };
+
       this.receiveChannel.onopen = () => {
         if (this.receiveChannel.readyState === 'open') {
           console.log('receive', evt);
@@ -93,9 +96,9 @@ export class WebRTC {
       this.receiveBuffer.push(evt.data);
       this.receivedSize += evt.data.byteLength;
 
-      this.progress.value = this.receivedSize;
+      this.receiveProgress.value = this.receivedSize;
 
-      if (this.receivedSize == this.file.size) {
+      if(this.receivedSize == this.file.size) {
         let received = new Blob(this.receiveBuffer);
 
         this.receivedSize = 0;
@@ -112,7 +115,6 @@ export class WebRTC {
     this.sendChannel.onclose = () => {
       console.log('channel closed');
       this.receiveChannel.close();
-      this.progress.value = 0;
       this.peerConnections = {};
       pc.close();
       pc = null;
@@ -160,7 +162,7 @@ export class WebRTC {
     if(file == undefined) {
       return;
     }
-    this.progress.max = file.size;
+    this.sendProgress.max = file.size;
     this.socket.emit('sending:data', {name: file.name, size: file.size, room: this.room});
 
     const chunkSize = 16384;
@@ -178,7 +180,7 @@ export class WebRTC {
           if (file.size > offset + e.target.result.byteLength) {
             setTimeout(sliceFile, 0, offset + chunkSize);
           }
-          this.progress.value = offset + e.target.result.byteLength;
+          this.sendProgress.value = offset + e.target.result.byteLength;
         };
       })(file);
       let slice = file.slice(offset, offset + chunkSize);

@@ -8,7 +8,10 @@ import {WebRTC} from 'services/webrtc';
 })
 
 @View({
-  template: `<input type="file"></input><progress max="0" value="0"></progress><a class="download"></a>`
+  template: `<input type="file"></input>
+             <progress max="0" value="0"></progress>
+             <progress max="0" value="0"></progress>
+             <a class="download"></a>`
 })
 
 export class Upload {
