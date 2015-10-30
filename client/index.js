@@ -29,6 +29,4 @@ class Main {
   }
 }
 
-setTimeout(() => {
-  bootstrap(Main, [ROUTER_BINDINGS, bind(LocationStrategy).toClass(PathLocationStrategy)]);
-}, 3000);
+bootstrap(Main, [ROUTER_BINDINGS, bind(LocationStrategy).toClass(PathLocationStrategy)]);
