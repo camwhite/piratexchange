@@ -65,7 +65,7 @@ export class WebRTC {
           this.download.href = URL.createObjectURL(received);
           this.download.download = this.file.name;
 
-          let text =`Save treasure ${this.file.name} - ${this.file.size}(bytes) to chest`;
+          let text =`Save yer treasure ${this.file.name} - ${this.file.size}(bytes)`;
           this.download.appendChild(document.createTextNode(text));
         }
       };
@@ -107,7 +107,7 @@ export class WebRTC {
         this.download.href = URL.createObjectURL(received);
         this.download.download = this.file.name;
 
-        let text = `Download ${this.file.name} - ${this.file.size}(bytes)`;
+        let text =`Save yer treasure ${this.file.name} - ${this.file.size}(bytes)`;
         this.download.appendChild(document.createTextNode(text));
       }
     };

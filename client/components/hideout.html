@@ -1,5 +1,12 @@
-<h1>The Hideout</h1>
+<div class="hideout">
 
-<p *ng-if="file">Receiving {{ file.name }} - {{ file.size }}</p>
+  <div class="heading">
+    <h1>The Hideout</h1>
+    <p *ng-if="file">Receiving {{ file.name }} - {{ file.size }}</p>
+  </div>
 
-<upload></upload>
+  <div class="uploader">
+    <upload></upload>
+  </div>
+
+</div>

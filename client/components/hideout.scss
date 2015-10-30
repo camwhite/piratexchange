@@ -1,0 +1,64 @@
+.hideout {
+  position: relative;
+  min-height: 100vh;
+  background: $hideout-color;
+  .heading {
+    padding: 20px 80px;
+    text-align: center;
+    color: white;
+    p {
+      margin-top: 50px;
+    }
+  }
+  .uploader {
+    @include align-hack;
+    input {
+      display: block;
+      position: relative;
+      width: get-vw(190px);
+      height: get-vw(190px);
+      margin: 10px auto;
+      outline: none;
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('../../assets/transport256.svg') $hideout-color center/cover;
+      }
+      &:after {
+        @include align-hack;
+        content: 'Drag and drop or click to plunder booty';
+        top: auto;
+        bottom: -10px;
+        font: 400 18px 'Anonymous Pro';
+        color: white;
+        white-space: nowrap;
+      }
+    }
+    progress {
+      display: block;
+      position: relative;
+      width: get-vw(600px);
+      height: 7px;
+      margin: 25px auto;
+      -webkit-appearance: none;
+      &::-webkit-progress-bar {
+        background: none;
+        border-radius: 6px;
+      }
+      &::-webkit-progress-value {
+        background: linear-gradient(90deg, #FDFC47 10%, #24FE41 90%);
+        border-radius: 6px;
+      }
+    }
+    a {
+      display: block;
+      padding: 10px;
+      color: white;
+      text-align: center;
+    }
+  }
+}
