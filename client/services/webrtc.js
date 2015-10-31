@@ -1,4 +1,4 @@
-import {Socket} from 'services/socket'
+import {Socket} from 'services/socket';
 
 export class WebRTC {
   constructor(socket: Socket) {
@@ -179,7 +179,7 @@ export class WebRTC {
     }
   }
   sendData() {
-    let file = this.input.files[0]
+    let file = this.input.files[0];
     if(file == undefined) {
       return;
     }
