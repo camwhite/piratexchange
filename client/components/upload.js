@@ -11,15 +11,15 @@ import {WebRTC} from 'services/webrtc';
   template: `<input type="file"></input>
              <progress max="0" value="0"></progress>
              <progress max="0" value="0"></progress>
-             <a class="download"></a>`
+             <div class="download"></div>`
 })
 
 export class Upload {
   constructor(elemRef: ElementRef, routeParams: RouteParams, webRTC: WebRTC) {
     this.routeParams = routeParams;
     this.el = elemRef.nativeElement;
-    console.log(this.el);
+    this.webRTC = webRTC;
 
-    this.webRTC = webRTC.init(this.routeParams.params, this.el);
+    this.webRTC.init(this.routeParams.params, this.el);
   }
 }

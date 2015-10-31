@@ -22,6 +22,7 @@ export class WebRTC {
     this.sendProgress = elem.children[1];
     this.receiveProgress = elem.children[2];
     this.download = elem.children[3];
+    this.link = document.createElement('a');
 
     this.input.addEventListener('change', () => {
 
@@ -62,11 +63,15 @@ export class WebRTC {
 
           this.receivedSize = 0;
           this.receiveBuffer = [];
-          this.download.href = URL.createObjectURL(received);
-          this.download.download = this.file.name;
 
-          let text =`Save yer treasure ${this.file.name} - ${this.file.size}(bytes)`;
-          this.download.appendChild(document.createTextNode(text));
+          this.link = this.link.cloneNode();
+          this.link.href = URL.createObjectURL(received);
+          this.link.download = this.file.name;
+
+          let text =`<p>Save yer treasure ${this.file.name} - ${this.file.size}(bytes)</p>`;
+          this.link.innerHTML = text;
+
+          this.download.appendChild(this.link);
         }
       };
 
@@ -104,11 +109,14 @@ export class WebRTC {
         this.receivedSize = 0;
         this.receiveBuffer = [];
 
-        this.download.href = URL.createObjectURL(received);
-        this.download.download = this.file.name;
+        this.link = this.link.cloneNode();
+        this.link.href = URL.createObjectURL(received);
+        this.link.download = this.file.name;
 
-        let text =`Save yer treasure ${this.file.name} - ${this.file.size}(bytes)`;
-        this.download.appendChild(document.createTextNode(text));
+        let text =`<p>Save yer treasure ${this.file.name} - ${this.file.size}(bytes)</p>`;
+        this.link.innerHTML = text;
+
+        this.download.appendChild(this.link);
       }
     };
 
