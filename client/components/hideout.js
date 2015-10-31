@@ -32,7 +32,8 @@ export class Hideout {
     this.socket.on('data', (file) => {
       this.file = {
         name: file.name,
-        size: file.size
+        size: file.size,
+        formattedSize: file.formattedSize
       };
 
       this.webRTC.file = this.file;

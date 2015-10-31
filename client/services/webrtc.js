@@ -77,7 +77,7 @@ export class WebRTC {
           this.link.href = URL.createObjectURL(received);
           this.link.download = this.file.name;
 
-          let text =`<p>Save yer treasure ${this.file.name} - ${this.file.size}(bytes)</p>`;
+          let text =`<p>Save yer treasure ${this.file.name} - ${this.file.formattedSize}</p>`;
           this.link.innerHTML = text;
 
           this.download.appendChild(this.link);
@@ -122,7 +122,7 @@ export class WebRTC {
         this.link.href = URL.createObjectURL(received);
         this.link.download = this.file.name;
 
-        let text =`<p>Save yer treasure ${this.file.name} - ${this.file.size}(bytes)</p>`;
+        let text =`<p>Save yer treasure ${this.file.name} - ${this.file.formattedSize}</p>`;
         this.link.innerHTML = text;
 
         this.download.appendChild(this.link);
@@ -184,7 +184,17 @@ export class WebRTC {
       return;
     }
     this.sendProgress.max = file.size;
-    this.socket.emit('sending:data', {name: file.name, size: file.size, room: this.room});
+
+    let formatBytes = (bytes, decimals) => {
+      var k = 1000;
+      var dm = decimals + 1 || 3;
+      var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      var i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
+    }
+
+    let formattedBytes = formatBytes(file.size, 3);
+    this.socket.emit('sending:data', {name: file.name, size: file.size, formattedSize: formattedBytes,  room: this.room});
 
     const chunkSize = 16384;
     let sliceFile = (offset) => {
