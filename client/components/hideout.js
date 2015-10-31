@@ -20,7 +20,7 @@ export class Hideout {
     this.socket = socket;
     this.webRTC = webRTC;
 
-    this.room = `hideout:${this.routeParams.params.id}`;
+    this.room = this.routeParams.params.id;
 
     this.socket.unSync();
     this.socket.init(this.room);

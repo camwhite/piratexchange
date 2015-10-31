@@ -25,9 +25,9 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('push:location', {pos: pos, id: socket.id});
   });
 
-  socket.on('match:made', (match) => {
-    console.log('Socket ' + socket.id + ' matched with ' + match.id);
-    socket.to(match.id).emit('users:matched', match);
+  socket.on('match:made', (matched) => {
+    console.log('Socket ' + matched.from + ' matched with ' + matched.to);
+    socket.to(matched.to).emit('users:matched', matched);
   });
 
   socket.on('msg', (call) => {

@@ -16,7 +16,17 @@ export class WebRTC {
   }
   init(params, elem) {
     this.params = params.id;
-    this.room = `hideout:${this.params}`;
+    this.room = this.params;
+
+    let firstId = this.params.split('').splice(0, 20).join('');
+    let secondId = this.params.split('').splice(20, 20).join('');
+
+    if(this.currentUserId != firstId) {
+      this.matchId = firstId;
+    }
+    else {
+      this.matchId = secondId;
+    }
 
     this.input = elem.children[0];
     this.sendProgress = elem.children[1];
@@ -25,7 +35,6 @@ export class WebRTC {
     this.link = document.createElement('a');
 
     this.input.addEventListener('change', () => {
-
       if(this.sendChannel != undefined) {
         this.sendData();
       }
@@ -132,8 +141,11 @@ export class WebRTC {
     return pc;
   }
   makeOffer() {
-    let id = this.params;
+    this.caller = true;
+
+    let id = this.matchId;
     let pc = this.getPeerConnection(id);
+
     pc.createOffer(sdp => {
       pc.setLocalDescription(sdp, () => {
         this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: id,  type: 'sdp-offer', sdp: sdp})
@@ -148,12 +160,13 @@ export class WebRTC {
           console.log('Setting remote description by offer');
           pc.createAnswer(sdp => {
             pc.setLocalDescription(sdp);
-            this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: call.by, sdp: sdp, type: 'sdp-answer'});
+            this.socket.emit('msg', {room: this.room, by: call.to, to: call.by, sdp: sdp, type: 'sdp-answer'});
           }, (err) => console.log(err));
         }, (err) => console.log(err));
         break;
       case 'sdp-answer':
         pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
+          this.caller = false;
           console.log('Setting remote description by answer');
         }, (err) => console.error(err));
         break;
@@ -178,7 +191,7 @@ export class WebRTC {
       let reader = new FileReader();
       reader.onload = (() => {
         return (e) => {
-          if(this.currentUserId != this.params) {
+          if(this.caller) {
             this.sendChannel.send(e.target.result);
           }
           else {

@@ -20,15 +20,13 @@ export class Piratexchange {
     this.locator = locator;
     this.socket = socket;
 
-    this.me = {
-      id: this.socket.socket.id
-    }
-
+    this.me = {};
     this.users = [];
     this.distances = [];
 
     this.locator.getLocation()
     .then((coords) => {
+      this.me.id = this.socket.socket.id;
       this.me.location = {
         lat: coords.latitude,
         lng: coords.longitude
@@ -42,7 +40,7 @@ export class Piratexchange {
     });
     this.socket.on('users:matched', (match) => {
       console.log(match);
-      this.router.navigate(`/hideout/${match.id}`);
+      this.router.navigate(`/hideout/${match.to}${match.from}`);
     });
   }
   matchmaking() {
@@ -61,14 +59,13 @@ export class Piratexchange {
     });
 
     if(this.match != undefined) {
-      this.socket.emit('match:made', this.match);
+      console.log(this.me);
+      this.socket.emit('match:made', {from: this.me.id, to: this.match.id});;
 
-      this.router.navigate(`/hideout/${this.match.id}`);
+      this.router.navigate(`/hideout/${this.match.id}${this.me.id}`);
     }
     else {
       this.noMatches = true;
     }
-
-    console.log(this.match);
   }
 }
