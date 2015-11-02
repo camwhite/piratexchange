@@ -30,6 +30,7 @@ export class Hideout {
     });
 
     this.socket.on('data', (file) => {
+      console.log(file);
       this.file = {
         name: file.name,
         size: file.size,

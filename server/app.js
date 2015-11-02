@@ -1,14 +1,13 @@
-var app = require('express')(),
+var express = require('express'),
+    app = require('express')(),
     server = require('http').Server(app),
-    io = require('socket.io')(server);
+    io = require('socket.io')(server),
+    path = require('path');
 
 app.use(require('connect-livereload')());
+app.use(express.static(path.join(__dirname, '../client')));
 
-app.get('/', (req, res) => {
-  res.send('shit ball!');
-});
-
-server.listen(3000, () => {
+server.listen(process.env.PORT || 3000, () => {
   var port = server.address().port;
   console.log('Hello from Express server listening on port:', port);
 });

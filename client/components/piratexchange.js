@@ -26,7 +26,6 @@ export class Piratexchange {
 
     this.locator.getLocation()
     .then((coords) => {
-      this.me.id = this.socket.socket.id;
       this.me.location = {
         lat: coords.latitude,
         lng: coords.longitude
@@ -59,6 +58,7 @@ export class Piratexchange {
     });
 
     if(this.match != undefined) {
+      this.me.id = this.socket.socket.id;
       console.log(this.me);
       this.socket.emit('match:made', {from: this.me.id, to: this.match.id});;
 

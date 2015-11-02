@@ -6,7 +6,7 @@ export class WebRTC {
     this.currentUserId = this.socket.socket.id;
 
     this.servers = {'iceServers': [
-      {'url': 'stun:stun.l.google.com:19302'}
+      {'url': 'stun:stun.ekiga.net'}
     ]};
 
     this.peerConnections = {};
@@ -32,10 +32,10 @@ export class WebRTC {
     this.sendProgress = elem.children[1];
     this.receiveProgress = elem.children[2];
     this.download = elem.children[3];
-    this.link = document.createElement('a');
+    this.linkEl = document.createElement('a');
 
     this.input.addEventListener('change', () => {
-      if(this.sendChannel != undefined) {
+      if(this.caller != undefined) {
         this.sendData();
       }
       else {
@@ -73,25 +73,14 @@ export class WebRTC {
           this.receivedSize = 0;
           this.receiveBuffer = [];
 
-          this.link = this.link.cloneNode();
-          this.link.href = URL.createObjectURL(received);
-          this.link.download = this.file.name;
+          var link = this.linkEl.cloneNode();
+          link.href = URL.createObjectURL(received);
+          link.download = this.file.name;
 
           let text =`<p>Save yer treasure ${this.file.name} - ${this.file.formattedSize}</p>`;
-          this.link.innerHTML = text;
+          link.innerHTML = text;
 
-          this.download.appendChild(this.link);
-        }
-      };
-
-      this.receiveChannel.onopen = () => {
-        if (this.receiveChannel.readyState === 'open') {
-          console.log('receive', evt);
-        }
-      };
-      this.receiveChannel.onclose = () => {
-        if (this.receiveChannel.readyState === 'open') {
-          console.log(this.receiveChannel);
+          this.download.appendChild(link);
         }
       };
     }
@@ -103,29 +92,6 @@ export class WebRTC {
       console.log('send', evt);
       if (this.sendChannel.readyState === 'open') {
         this.sendData();
-      }
-    };
-
-    this.sendChannel.onmessage = (evt) => {
-      this.receiveBuffer.push(evt.data);
-      this.receivedSize += evt.data.byteLength;
-
-      this.receiveProgress.value = this.receivedSize;
-
-      if(this.receivedSize == this.file.size) {
-        let received = new Blob(this.receiveBuffer);
-
-        this.receivedSize = 0;
-        this.receiveBuffer = [];
-
-        this.link = this.link.cloneNode();
-        this.link.href = URL.createObjectURL(received);
-        this.link.download = this.file.name;
-
-        let text =`<p>Save yer treasure ${this.file.name} - ${this.file.formattedSize}</p>`;
-        this.link.innerHTML = text;
-
-        this.download.appendChild(this.link);
       }
     };
 
@@ -141,8 +107,6 @@ export class WebRTC {
     return pc;
   }
   makeOffer() {
-    this.caller = true;
-
     let id = this.matchId;
     let pc = this.getPeerConnection(id);
 
@@ -158,6 +122,7 @@ export class WebRTC {
       case 'sdp-offer':
         pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
           console.log('Setting remote description by offer');
+          this.caller = true;
           pc.createAnswer(sdp => {
             pc.setLocalDescription(sdp);
             this.socket.emit('msg', {room: this.room, by: call.to, to: call.by, sdp: sdp, type: 'sdp-answer'});
@@ -166,8 +131,8 @@ export class WebRTC {
         break;
       case 'sdp-answer':
         pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
-          this.caller = false;
           console.log('Setting remote description by answer');
+          this.caller = false;
         }, (err) => console.error(err));
         break;
       case 'ice':
@@ -201,12 +166,7 @@ export class WebRTC {
       let reader = new FileReader();
       reader.onload = (() => {
         return (e) => {
-          if(this.caller) {
-            this.sendChannel.send(e.target.result);
-          }
-          else {
-            this.receiveChannel.send(e.target.result);
-          }
+          this.sendChannel.send(e.target.result);
 
           if (file.size > offset + e.target.result.byteLength) {
             setTimeout(sliceFile, 0, offset + chunkSize);
@@ -217,6 +177,7 @@ export class WebRTC {
       let slice = file.slice(offset, offset + chunkSize);
       reader.readAsArrayBuffer(slice);
     };
+
     sliceFile(0);
   }
 }

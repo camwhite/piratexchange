@@ -1,7 +1,7 @@
 import Io from 'lib/socket.io';
 
 export class Socket {
-  socket = Io.connect(':3000');
+  socket = Io.connect();
 
   emit(evt, payload) {
     this.socket.emit(evt, payload);
