@@ -11,7 +11,7 @@
     }
   }
   .uploader {
-    @include align-hack;
+    margin-top: 60px;
     input {
       display: block;
       position: relative;
