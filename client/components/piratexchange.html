@@ -2,13 +2,14 @@
 
   <div class="splash">
     <div class="hero">
+      <span>available skallywags: {{ users.length }}</span>
       <h1>pirateXchange</h1>
       <div class="location">
         <p *ng-if="!me.location">Locating MATEY</p>
         <p *ng-if="me.location">Lat: {{ me.location.lat }} Long: {{ me.location.lng }}</p>
       </div>
       <button *ng-if="me.location" (click)="matchmaking()">MATCH</button>
-      <p *ng-if="noMatches">No Matches AARGH</p>
+      <p *ng-if="noMatches">No Matches AARGH. Trying again in {{ time }}s</p>
     </div>
   </div>
 
