@@ -24,6 +24,8 @@ export class Piratexchange {
     this.users = [];
     this.distances = [];
 
+    this.isChrome = /chrome/i.test(navigator.userAgent);
+
     this.locator.getLocation()
     .then((coords) => {
       this.me.location = {

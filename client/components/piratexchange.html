@@ -1,7 +1,7 @@
 <div class="landing">
 
   <div class="splash">
-    <div class="hero">
+    <div class="hero" *ng-if="isChrome">
       <span>available skallywags: {{ users.length }}</span>
       <h1>pirateXchange</h1>
       <div class="location">
@@ -10,6 +10,11 @@
       </div>
       <button *ng-if="me.location" (click)="matchmaking()">MATCH</button>
       <p *ng-if="noMatches">No Matches AARGH. Trying again in {{ time }}s</p>
+    </div>
+    <div class="hero" *ng-if="!isChrome">
+      <h1>pirateXchange</h1>
+      <p>ARGHH your browser is not supported at this time MATEY</p>
+      <p>Hint: Chrome only</p>
     </div>
   </div>
 
