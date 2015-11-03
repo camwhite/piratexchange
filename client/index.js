@@ -25,7 +25,6 @@ import {Hideout} from 'components/hideout';
 
 class Main {
   constructor() {
-
   }
 }
 

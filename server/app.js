@@ -18,6 +18,17 @@ io.on('connection', (socket) => {
   socket.on('join', (room) => {
     console.log('Socket ' + socket.id + ' joined room ' + room);
     socket.join(room);
+    socket.to(room).emit('status:changed', socket.adapter.rooms[room]);
+  });
+
+  socket.on('leave', (room) => {
+    console.log('Socket ' + socket.id + ' left room ' + room);
+    socket.leave(room);
+    socket.to(room).emit('status:changed', socket.adapter.rooms[room]);
+  });
+
+  socket.on('user:status', (room) => {
+    socket.to(room).emit('status:changed', socket.adapter.rooms[room]);
   });
 
   socket.on('user:located', (pos) => {

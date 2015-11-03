@@ -14,6 +14,9 @@ export class Socket {
   init(room) {
     this.socket.emit('join', room);
   }
+  leave(room) {
+    this.socket.emit('leave', room);
+  }
   unSync() {
     this.socket.removeAllListeners();
   }
