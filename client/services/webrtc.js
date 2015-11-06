@@ -13,6 +13,7 @@ export class WebRTC {
     this.file = {};
     this.receiveBuffer = [];
     this.receivedSize = 0;
+    this.percentLoaded = 0;
   }
   init(params, elem) {
     this.params = params.id;
@@ -68,6 +69,8 @@ export class WebRTC {
         this.receiveProgress.value = this.receivedSize;
 
         if (this.receivedSize == this.file.size) {
+          pc.getStats(null, (stats) => console.log(stats));
+
           let received = new Blob(this.receiveBuffer);
 
           this.receivedSize = 0;
@@ -85,7 +88,7 @@ export class WebRTC {
       };
     }
 
-    this.sendChannel = pc.createDataChannel('Send Channel');
+    this.sendChannel = pc.createDataChannel('Send Channel', {ordered: false, reliable: false});
     this.sendChannel.binaryType = 'arraybuffer';
 
     this.sendChannel.onopen = (evt) => {
@@ -101,7 +104,6 @@ export class WebRTC {
       this.peerConnections = {};
       pc.close();
       pc = null;
-      console.log(pc);
     };
 
     return pc;
@@ -148,6 +150,7 @@ export class WebRTC {
     if(file == undefined) {
       return;
     }
+
     this.sendProgress.max = file.size;
 
     let formatBytes = (bytes, decimals) => {
@@ -162,18 +165,24 @@ export class WebRTC {
     this.socket.emit('sending:data', {name: file.name, size: file.size, formattedSize: formattedBytes,  room: this.room});
 
     const chunkSize = 16384;
+    const bufferMax = 16596992;
     let sliceFile = (offset) => {
       let reader = new FileReader();
-      reader.onload = (() => {
-        return (e) => {
-          this.sendChannel.send(e.target.result);
+      reader.onload = ((e) => {
+        console.log(this.sendChannel.bufferedAmount);
+        let bufferCheck = this.sendChannel.bufferedAmount > bufferMax;
+        this.sendChannel.send(e.target.result);
 
-          if (file.size > offset + e.target.result.byteLength) {
-            setTimeout(sliceFile, 0, offset + chunkSize);
-          }
-          this.sendProgress.value = offset + e.target.result.byteLength;
-        };
-      })(file);
+        if (file.size > offset + e.target.result.byteLength && bufferCheck) {
+          console.log('overflow');
+          setTimeout(sliceFile, 250, offset + chunkSize);
+        }
+        else if (file.size > offset + e.target.result.byteLength) {
+          setTimeout(sliceFile, 0, offset + chunkSize);
+        }
+
+        this.sendProgress.value = offset + e.target.result.byteLength;
+      });
       let slice = file.slice(offset, offset + chunkSize);
       reader.readAsArrayBuffer(slice);
     };

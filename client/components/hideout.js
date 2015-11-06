@@ -21,7 +21,7 @@ export class Hideout {
     this.socket = socket;
     this.webRTC = webRTC;
 
-    this.users = [];
+    this.users = ['foo', 'bar'];
     this.room = this.routeParams.params.id;
 
     this.socket.unSync();
@@ -54,5 +54,6 @@ export class Hideout {
   }
   onDeactivate(next: ComponentInstruction, prev: ComponentInstruction) {
     this.socket.leave(this.room);
+    this.webRTC.sendChannel.close();
   }
 }
