@@ -1,17 +1,17 @@
 <div class="landing">
 
   <div class="splash">
-    <div class="hero" *ng-if="isChrome">
-      <span>available skallywags: {{ users.length }}</span>
+    <div class="hero" *ngIf="isChrome">
+      <span>available skallywags: {{ peers.length }}</span>
       <h1>pirateXchange</h1>
       <div class="location">
-        <p *ng-if="!me.location">Locating MATEY</p>
-        <p *ng-if="me.location">Lat: {{ me.location.lat }} Long: {{ me.location.lng }}</p>
+        <p *ngIf="!me.location">Locating MATEY</p>
+        <p *ngIf="me.location">Lat: {{ me.location.lat }} Long: {{ me.location.lng }}</p>
       </div>
-      <button *ng-if="me.location" (click)="matchmaking()">MATCH</button>
-      <p *ng-if="noMatches">No Matches AARGH. Trying again in {{ time }}s</p>
+      <button (click)="onMatchmaking()">MATCH</button>
+      <p *ngIf="noMatches">No Matches AARGH. Trying again in {{ time }}s</p>
     </div>
-    <div class="hero" *ng-if="!isChrome">
+    <div class="hero" *ngIf="!isChrome">
       <h1>pirateXchange</h1>
       <p>ARGHH your browser is not supported at this time MATEY</p>
       <p>Hint: Chrome only</p>
@@ -21,11 +21,11 @@
   <div class="callout">
     <div class="hero">
       <figure>
-        <svg-icon src="../assets/direction141.svg"></svg-icon>
+        <svg-icon [src]="'/assets/direction141.svg'"></svg-icon>
       </figure>
       <p>Match with nearest skallywag and offer up files</p>
       <figure>
-        <svg-icon src="../assets/transport256.svg"></svg-icon>
+        <svg-icon [src]="'/assets/transport256.svg'"></svg-icon>
       </figure>
       <p>Send your files through direct P2P connection</p>
     </div>
@@ -46,7 +46,7 @@
 
   <div class="footer">
     <footer class="hero">
-      <p>&copy; pirateXchange | 2015</p>
+      <p>&copy; pirateXchange | 2016</p>
       <p>Disclaimer: pirateXchange does not host or distribute any files directly, what is transmitted is solely provided by the using parties.</p>
     </footer>
   </div>

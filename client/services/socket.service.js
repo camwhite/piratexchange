@@ -1,7 +1,9 @@
-import Io from 'lib/socket.io';
+import { Injectable } from '@angular/core';
+import * as io from 'socket.io-client';
 
-export class Socket {
-  socket = Io.connect();
+@Injectable()
+export class SocketService {
+  socket = io.connect();
 
   emit(evt, payload) {
     this.socket.emit(evt, payload);
@@ -11,13 +13,13 @@ export class Socket {
       cb(payload);
     });
   }
-  init(room) {
+  join(room) {
     this.socket.emit('join', room);
   }
   leave(room) {
     this.socket.emit('leave', room);
   }
-  unSync() {
+  unsync() {
     this.socket.removeAllListeners();
   }
 }

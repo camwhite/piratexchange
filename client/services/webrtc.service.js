@@ -1,10 +1,12 @@
-import {Socket} from 'services/socket';
+import { Injectable } from '@angular/core';
+import { SocketService } from './socket.service';
 
-export class WebRTC {
-  constructor(socket: Socket) {
+require('webrtc-adapter');
+
+@Injectable()
+export class WebRTCService {
+  constructor(socket: SocketService) {
     this.socket = socket;
-    this.currentUserId = this.socket.socket.id;
-
     this.servers = {'iceServers': [
       {'url': 'stun:stun.ekiga.net'}
     ]};
@@ -16,18 +18,7 @@ export class WebRTC {
     this.percentLoaded = 0;
   }
   init(params, elem) {
-    this.params = params.id;
-    this.room = this.params;
-
-    let firstId = this.params.split('').splice(0, 20).join('');
-    let secondId = this.params.split('').splice(20, 20).join('');
-
-    if(this.currentUserId != firstId) {
-      this.matchId = firstId;
-    }
-    else {
-      this.matchId = secondId;
-    }
+    this.room = params;
 
     this.input = elem.children[0];
     this.sendProgress = elem.children[1];
@@ -35,14 +26,21 @@ export class WebRTC {
     this.download = elem.children[3];
     this.linkEl = document.createElement('a');
 
-    this.input.addEventListener('change', () => {
-      if(this.caller != undefined) {
-        this.sendData();
-      }
-      else {
-        this.makeOffer();
-      }
-    }, false);
+    this.socket.on('peer:signal', (call) => {
+      this.handleCall(call);
+    });
+    this.socket.on('peer:data', (file) => {
+      this.file = file;
+      this.receiveProgress.max = file.size;
+    });
+  }
+  onChange() {
+    if(this.caller) {
+      this.sendData();
+    }
+    else {
+      this.makeOffer();
+    }
   }
   getPeerConnection(id) {
     if(this.peerConnections[id]) {
@@ -54,7 +52,7 @@ export class WebRTC {
 
     pc.onicecandidate = (evt) => {
       if(evt.candidate != null) {
-        this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: id, ice: evt.candidate, type: 'ice'});
+        this.socket.emit('peer:signal', { room: this.room, ice: evt.candidate, type: 'ice' });
       }
     }
 
@@ -69,8 +67,6 @@ export class WebRTC {
         this.receiveProgress.value = this.receivedSize;
 
         if (this.receivedSize == this.file.size) {
-          pc.getStats(null, (stats) => console.log(stats));
-
           let received = new Blob(this.receiveBuffer);
 
           this.receivedSize = 0;
@@ -88,18 +84,16 @@ export class WebRTC {
       };
     }
 
-    this.sendChannel = pc.createDataChannel('Send Channel', {ordered: false, reliable: false});
+    this.sendChannel = pc.createDataChannel('Send Channel', { ordered: false, reliable: false });
     this.sendChannel.binaryType = 'arraybuffer';
 
     this.sendChannel.onopen = (evt) => {
-      console.log('send', evt);
       if (this.sendChannel.readyState === 'open') {
         this.sendData();
       }
     };
 
     this.sendChannel.onclose = () => {
-      console.log('channel closed');
       this.receiveChannel.close();
       this.peerConnections = {};
       pc.close();
@@ -109,17 +103,16 @@ export class WebRTC {
     return pc;
   }
   makeOffer() {
-    let id = this.matchId;
-    let pc = this.getPeerConnection(id);
+    let pc = this.getPeerConnection(this.room);
 
     pc.createOffer(sdp => {
       pc.setLocalDescription(sdp, () => {
-        this.socket.emit('msg', {room: this.room, by: this.currentUserId, to: id,  type: 'sdp-offer', sdp: sdp})
+        this.socket.emit('peer:signal', { room: this.room, type: 'sdp-offer', sdp: sdp });
       });
     }, (err) => console.log(err));
   }
   handleCall(call) {
-    var pc = this.getPeerConnection(call.by);
+    var pc = this.getPeerConnection(this.room);
     switch(call.type) {
       case 'sdp-offer':
         pc.setRemoteDescription(new RTCSessionDescription(call.sdp), () => {
@@ -127,7 +120,11 @@ export class WebRTC {
           this.caller = true;
           pc.createAnswer(sdp => {
             pc.setLocalDescription(sdp);
-            this.socket.emit('msg', {room: this.room, by: call.to, to: call.by, sdp: sdp, type: 'sdp-answer'});
+            this.socket.emit('peer:signal', {
+              room: this.room,
+              sdp: sdp,
+              type: 'sdp-answer'
+            });
           }, (err) => console.log(err));
         }, (err) => console.log(err));
         break;
@@ -147,7 +144,7 @@ export class WebRTC {
   }
   sendData() {
     let file = this.input.files[0];
-    if(file == undefined) {
+    if(!file) {
       return;
     }
 
@@ -162,19 +159,22 @@ export class WebRTC {
     }
 
     let formattedBytes = formatBytes(file.size, 3);
-    this.socket.emit('sending:data', {name: file.name, size: file.size, formattedSize: formattedBytes,  room: this.room});
+    this.socket.emit('peer:data', {
+      name: file.name,
+      size: file.size,
+      formattedSize: formattedBytes,
+      room: this.room
+    });
 
     const chunkSize = 16384;
     const bufferMax = 16596992;
     let sliceFile = (offset) => {
       let reader = new FileReader();
-      reader.onload = ((e) => {
-        console.log(this.sendChannel.bufferedAmount);
+      reader.onload = (e => {
         let bufferCheck = this.sendChannel.bufferedAmount > bufferMax;
         this.sendChannel.send(e.target.result);
 
         if (file.size > offset + e.target.result.byteLength && bufferCheck) {
-          console.log('overflow');
           setTimeout(sliceFile, 250, offset + chunkSize);
         }
         else if (file.size > offset + e.target.result.byteLength) {
