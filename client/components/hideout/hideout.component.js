@@ -37,11 +37,16 @@ export class HideoutComponent {
     });
 
     window.onbeforeunload = () => {
+      if(this.webRTC.sendChannel) {
+        this.webRTC.sendChannel.close();
+      }
       this.socket.leave(this.room);
     }
   }
   ngOnDestroy() {
+    if(this.webRTC.sendChannel) {
+      this.webRTC.sendChannel.close();
+    }
     this.socket.leave(this.room);
-    this.webRTC.sendChannel.close();
   }
 }

@@ -50,7 +50,8 @@ export class PiratexchangeComponent {
         this.me.location = {
           lat: coords.latitude,
           lng: coords.longitude
-        }
+        };
+
         this.handleMatchmaking();
       }).catch((err) => console.log(err));
   }

@@ -1,9 +1,8 @@
 # pirateXchange
 
-A WebRTC p2p matchmaking service
+> A WebRTC p2p file trasfer matchmaker
 
 ### Installation
 
-- clone this repository
-- `npm install`
-- `gulp dev`
+1. `npm i`
+2. `npm start`
