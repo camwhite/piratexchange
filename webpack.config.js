@@ -1,85 +1,69 @@
-'use strict';
+'use strict'
 
-// Modules
-const path = require('path');
-const webpack = require('webpack');
+const path = require('path')
+const webpack = require('webpack')
 
-var entryPoints = [
-  path.join(__dirname, 'client', 'main.js')
-];
+let devtool
 
-var plugins = [
-  new webpack.optimize.OccurenceOrderPlugin()
-];
-
-var devTool = '';
+const entryPoints = [ path.join(__dirname, 'client', 'main.js') ]
+const plugins = [
+  new webpack.DefinePlugin({
+    __PROD__: process.env.NODE_ENV === 'production'
+  }),
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    chunks: ['main'],
+    minChunks: module => /node_modules/.test(module.resource)
+  }),
+  new webpack.ContextReplacementPlugin(
+    /angular(\\|\/)core(\\|\/)@angular/,
+    './client',
+    {}
+  )
+]
 
 if (process.env.NODE_ENV !== 'production') {
-  entryPoints.push('webpack-hot-middleware/client');
-  plugins.push(new webpack.HotModuleReplacementPlugin());
-  plugins.push(new webpack.NoErrorsPlugin());
-  plugins.push(new webpack.DefinePlugin({
-    PROD: false
-  }));
+  entryPoints.push('webpack-hot-middleware/client')
+  plugins.push(
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoEmitOnErrorsPlugin()
+  )
 
-  devTool = 'eval';
-}
-else {
-  plugins.push(new webpack.optimize.DedupePlugin());
-  plugins.push(new webpack.DefinePlugin({
-    PROD: true
-  }));
-  plugins.push(new webpack.optimize.UglifyJsPlugin({
-    minimize: true,
-    mangle: {
-      screw_ie8: true
-    },
-    compress: {
-      warnings: true
-    }
-  }));
-
-  devTool = 'source-map';
+  devtool = 'eval'
+} else {
+  plugins.push(new webpack.optimize.UglifyJsPlugin())
+  devtool = false
 }
 
 module.exports = {
   entry: {
     main: entryPoints,
-    vendor: ['core-js', 'zone.js/dist/zone', 'eric-meyer-reset.scss/_reset.scss']
+    vendor: ['core-js', 'zone.js/dist/zone']
   },
-  devtool: devTool,
+  devtool: devtool,
   output: {
-    path: path.join(__dirname, 'public', 'js'),
-    dist: 'public/js',
+    path: path.resolve(__dirname, 'public', 'js'),
     publicPath: '/js',
     filename: '[name].bundle.js'
   },
-  resolveLoader: {
-    root: [path.resolve('node_modules')],
-    extensions: ['', '.js', '.ts']
-  },
   resolve: {
-    root: [path.resolve('node_modules'), path.join('public', 'js')],
-    extensions: ['', '.js', '.ts', '.json']
+    modules: [ 'node_modules', path.resolve(__dirname, 'public', 'js') ],
+    extensions: [ '.ts', '.js', '.json' ]
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(js|ts)$/,
-        include: [
-         path.resolve('client'),
-         path.resolve('node_modules')
-        ],
-        loader: 'awesome-typescript-loader'
+        exclude: /node_modules/,
+        use: [
+          { loader: 'awesome-typescript-loader' }
+        ]
       },
-      { test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/, loader: 'file' },
-      { test: /\.html$/, loader: 'raw' },
-      { test: /\.scss$/, loaders: ['style', 'css', 'sass'] },
-      { test: /\.css$/, loaders: ['style', 'css'] }
-    ],
-    externals: {
-      '@angular': 'angular',
-    },
+      { test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/, use: 'file-loader' },
+      { test: /\.html$/, use: 'raw-loader' },
+      { test: /\.scss$/, use: [ 'style-loader?singleton=true', 'css-loader', 'sass-loader' ] },
+      { test: /\.css$/, use: [ 'style-loader', 'css-loader' ] }
+    ]
   },
   plugins: plugins
-};
+}

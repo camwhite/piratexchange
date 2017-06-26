@@ -5,7 +5,7 @@ const webpackHotMiddleWare = require('webpack-hot-middleware');
 const config = require('./webpack.config');
 
 exports.bindTo = (app) => {
-  var compiler = webpack(config);
+  const compiler = webpack(config);
   app.use(webpackDevMiddleWare(compiler, {
     publicPath: config.output.publicPath,
     hot: true,
