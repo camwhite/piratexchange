@@ -8,7 +8,17 @@ export class WebRTCService {
   constructor(socket: SocketService) {
     this.socket = socket;
     this.servers = {'iceServers': [
-      {'url': 'stun:stun.ekiga.net'}
+      {'urls': 'stun:stun.l.google.com:19302'},
+      {
+        urls: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+      },
+      {
+        urls: 'turn:192.158.29.39:3478?transport=udp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+      }
     ]};
 
     this.peerConnections = {};
